@@ -4,12 +4,13 @@ import React from "react";
 //import { Parent } from "./features/demo/PropsBadCode";
 //import CounterWrap from "./features/demo/MemoAndUseMemoAndUseCallback";
 //import Modal from "./features/demo/Modal";
-import Modal from "./features/demo/Modal";
+import Modal from "./features/demo/ModalWithPortal";
+import MyComponent from "./features/demo/MyComponent";
 import "./App.css";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App" style={{ height: "1000px", overflowY: "auto" }}>
       {/*       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <Counter />
@@ -58,8 +59,6 @@ function App() {
       {/* <Parent /> */}
       {/* <CounterWrap /> */}
       <Modal title="Hello" open={true}>
-        <p>abc</p>
-        <p>abc</p>
         <p>abc</p>
         <p>abc</p>
         <p>abc</p>

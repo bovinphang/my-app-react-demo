@@ -1,41 +1,87 @@
 //使用Portals
 //在这个示例中，我们使用Portal将弹出窗口附加到DOM树的body元素上，从而确保即使页面滚动，该弹出窗口也始终可见。
-import React, { useState } from "react";
+import React, { ReactNode, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
+import {
+  ModalBackground,
+  ModalBody,
+  CloseButton,
+  ButtonContainer,
+  Title,
+} from "./Modal.styles";
 
-type Props = {
-  onClose: () => void;
+type ModalProps = {
+  title?: string;
+  open: boolean;
+  onOk?: () => void | undefined;
+  onCancel?: () => void | undefined;
+  children?: ReactNode;
 };
 
-const ModalContent: React.FC<Props> = ({ onClose }) => {
+type ModalContentProps = Omit<ModalProps, "open" | "onCancel"> & {
+  onCancel: () => void;
+};
+
+const ModalContent: React.FC<ModalContentProps> = ({
+  title,
+  onOk,
+  onCancel,
+  children,
+}) => {
+  const handleModalClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+    },
+    []
+  );
+
   return (
-    <div className="modal">
-      <p>This is a portal modal</p>
-      <button onClick={onClose}>Close</button>
-    </div>
+    <ModalBackground onClick={onCancel}>
+      <ModalBody onClick={handleModalClick}>
+        <CloseButton onClick={onCancel}>&times;</CloseButton>
+        {title && <Title>{title}</Title>}
+        {children}
+        <ButtonContainer>
+          <button onClick={onOk}>确定</button>
+          <button onClick={onCancel}>取消</button>
+        </ButtonContainer>
+      </ModalBody>
+    </ModalBackground>
   );
 };
 
-const Modal: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const Modal: React.FC<ModalProps> = ({
+  title,
+  open,
+  onOk,
+  onCancel,
+  children,
+}) => {
+  const [isOpen, setIsOpen] = useState<boolean>(open);
 
-  const openModal = () => {
-    setIsOpen(true);
-  };
-
-  const closeModal = () => {
+  const handleOnOk = useCallback(() => {
     setIsOpen(false);
-  };
+    onOk?.();
+  }, []);
 
+  const handleOnCancel = useCallback(() => {
+    setIsOpen(false);
+    onCancel?.();
+  }, []);
   return (
     <div>
       {isOpen &&
         ReactDOM.createPortal(
-          <ModalContent onClose={closeModal} />,
+          <ModalContent
+            title={title}
+            onOk={handleOnOk}
+            onCancel={handleOnCancel}
+          >
+            {children}
+          </ModalContent>,
           document.body
           /* document.getElementById("root") as HTMLElement */
         )}
-      <button onClick={openModal}>Open Portal Modal</button>
     </div>
   );
 };
